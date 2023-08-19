@@ -11,12 +11,11 @@ router.get("/", async (req, res) => {
   if (limit) {
     const limitedProducts = products.slice(0, limit);
     res.status(200).json(limitedProducts);
-  } else if (!limit) {
-    res.status(200).json(products);
   } else {
-    res.status(400).json({ message: "Error al obtener los productos" });
+    res.status(200).json(products);
   }
 });
+
 router.get("/:pid", async (req, res) => {
   const id = parseInt(req.params.pid);
   const product = await manager.getProductsById(id);
@@ -40,9 +39,14 @@ router.post("/", async (req, res) => {
       res.status(201).json({ message: "Producto creado", product });
     }
   } catch (error) {
-    throw new error("Error al crear el producto", error);
+    console.error("Error al crear el producto:", error);
+    res.status(500).json({
+      message: "Error interno del servidor al crear el producto",
+      error: error.message,
+    });
   }
 });
+
 router.put("/:pid", async (req, res) => {
   const id = parseInt(req.params.pid);
   const product = await manager.updateProduct(id, req.body);
